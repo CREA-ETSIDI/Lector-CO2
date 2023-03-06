@@ -1,6 +1,6 @@
 //todos los #define de la parte de mq se va a meter después en un constructor (o como se llame)
 //definicion de donde se conectan
-#define MQ2 A0
+#define pin_MQ2 A0
 //#define MQ3 A1
 //#define MQ4 A2
 //#define MQ5 A3
@@ -10,77 +10,90 @@
 //#define MQ9 A7
 //#define MQ135 A8
 
-//Expresada en KiloOhmios
-#define R2 10
-//#define R3 10
-//#define R4 10
-//#define R5 10
-//#define R6 10
-//#define R7 10
-//#define R8 10
-//#define R9 10
-//#define R135 10
-
-//nombre de los gases que puede captar el sensor
-#define GAS_LPG 0
-#define GAS_CO 1
-
-float LPGCurva[3] = {2.3, 0.21, -0.47};
-float COCurva[3] = {1, 1, 1};
-
-//variables randoms
-#define MRPC 10 //muestras recogidas para la calibración
-#define RAL 9.83 //resistencia del sensor en el aire limpio 
 
 //Expresada en KiloOhmios (RESULTADOS DE CALIBRACIÓN)
 float RC_MQ2 = 10;
 //float RC_MQ3 = 10;
 //float RC_MQ4 = 10;
 //float RC_MQ5 = 10;
-//float RC_MQ6 = 10;
-//float RC_MQ7 = 10;
 //float RC_MQ8 = 10;
 //float RC_MQ9 = 10;
+//float RC_MQ6 = 10;
+//float RC_MQ7 = 10;
 //float RC_MQ135 = 10;
 
+class MQ{
+  public:
+  //Expresada en KiloOhmios
+    float R;
+    //variables randoms
+    float MRPC; //muestras recogidas para la calibración
+    float RAL; //resistencia del sensor en el aire limpio 
+    
+    MQ():R(10), MRPC(10), RAL(9.83){};
+    
+    //funciones
+    float CalculoRMQ(int val);
+    float CalibracionMQ (int pin);
+    float LecturaMQ(int pin);
+    virtual int PorcentajeMQ(float ratio, int id);
+    int GetPorcentajeMQ(float ratio, float *curva);
+  };
+  
+class MQ2:public MQ{     //mq2: lpg, CO, CH4
+  public:
+  //curvas
+    float LPGCurva[3] = {2.3, 0.21, -0.47};
+    float COCurva[3] = {2.3, 0.71, -0.28};
+    float CH4Curva[3] = {2.3, 0.477, -0.41};
+    enum GASES {GAS_LPG=0, GAS_CO, GAS_CH4};
+    MQ2():MQ(){};
+    
+    //funciones
+    int PorcentajeMQ(float ratio, int id);
+  };
+  
 String readString;
+MQ2 mq;
 
 void setup() {
   Serial.begin(9600);
   //calibración de MQ (todos en teoría, habría q ir poniendolos para que fueran saliendo-pero not yet-)
-  Serial.println("Calibrando el sensor MQ2 "); 
-  RC_MQ2 = CalibracionMQ(MQ2);
+  Serial.print("Calibrando el sensor MQ2 ");
+  RC_MQ2 = mq.CalibracionMQ(pin_MQ2);
   Serial.println(RC_MQ2);
- /* RC_MQ3 = CalibracionMQ(MQ3);
-  RC_MQ4 = CalibracionMQ(MQ4);
-  RC_MQ5 = CalibracionMQ(MQ5);
-  RC_MQ6 = CalibracionMQ(MQ6);
-  RC_MQ7 = CalibracionMQ(MQ7);
-  RC_MQ8 = CalibracionMQ(MQ8);
-  RC_MQ9 = CalibracionMQ(MQ9);*/
-//  Resultados_Calibracion_MQ135 = CalibracionMQ(MQ135);
+  /* RC_MQ3 = CalibracionMQ(MQ3);
+    RC_MQ4 = CalibracionMQ(MQ4);
+    RC_MQ5 = CalibracionMQ(MQ5);
+    RC_MQ6 = CalibracionMQ(MQ6);
+    RC_MQ7 = CalibracionMQ(MQ7);
+    RC_MQ8 = CalibracionMQ(MQ8);
+    RC_MQ9 = CalibracionMQ(MQ9);
+    RC_MQ135 = CalibracionMQ(MQ135);*/
 }
 
 void loop() {
-  while (Serial.available()) {
-    delay(2);
-    char c = Serial.read();
-    readString += c;
-    readString.toLowerCase();
-    readString.trim();
-  }
-  if (readString == "lpg")
-    Serial.println(PorcentajeMQ(LecturaMQ(MQ2) / RC_MQ2, GAS_LPG) );
-//  else if (readString == "co")
-//    Serial.println(PorcentajeMQ(LecturaMQ(MQ2) / RC_MQ2, GAS_CO) );
-//  readString = "";
+  //  while (Serial.available()) {
+  //    delay(2);
+  //    char c = Serial.read();
+  //    readString += c;
+  //    readString.toLowerCase();
+  //    readString.trim();
+  //  }
+  Serial.print("LPG:");
+  Serial.println(mq.PorcentajeMQ(mq.LecturaMQ(pin_MQ2) / RC_MQ2, mq.GAS_LPG) );
+  Serial.print("CO:");
+  Serial.println(mq.PorcentajeMQ(mq.LecturaMQ(pin_MQ2) / RC_MQ2, mq.GAS_CO) );
+  Serial.print("CH4:");
+  Serial.println(mq.PorcentajeMQ(mq.LecturaMQ(pin_MQ2) / RC_MQ2, mq.GAS_CH4) );
+  readString = "";
 }
 
-float CalculoRMQ(int val) { //calculo de las resistencia del sensor
-  return (((float)R2 * (1023 - val) / val));
+float MQ::CalculoRMQ(int val) { //calculo de las resistencia del sensor
+  return (((float)R * (1023 - val) / val));
 }
 
-float CalibracionMQ (int pin) { //funcion que calibra los MQ
+float MQ::CalibracionMQ (int pin) { //funcion que calibra los MQ
   float valor = 0;
   for (int i = 0; i < MRPC; i++) { // toma una serie de medidas previas para ver si se está calibrando o no
     valor += CalculoRMQ(analogRead(pin));
@@ -92,7 +105,7 @@ float CalibracionMQ (int pin) { //funcion que calibra los MQ
   return valor;
 }
 
-float LecturaMQ(int pin) {
+float MQ::LecturaMQ(int pin) {
   float valor = 0;
   for (int i = 0; i < MRPC; i++) { // toma una serie de medidas previas para ver si se está calibrando o no
     valor += CalculoRMQ(analogRead(pin));
@@ -101,16 +114,23 @@ float LecturaMQ(int pin) {
   valor = valor / MRPC;
   return valor;
 }
-int PorcentajeMQ(float ratio, int id) { //para identificar el tipo de gas
-  if (id = GAS_LPG) {
+int MQ::PorcentajeMQ(float ratio, int id) { //para identificar el tipo de gas
+  
+}
+int MQ::GetPorcentajeMQ(float ratio, float *curva) {
+  return (pow(10, (((log(ratio) - curva[1]) / curva[2]) + curva[0])));
+}
+//
+
+int MQ2::PorcentajeMQ(float ratio, int id) { //para identificar el tipo de gas
+  if (id == GAS_LPG) {
     return GetPorcentajeMQ(ratio, LPGCurva);
   }
   if (id == GAS_CO) {
     return GetPorcentajeMQ(ratio, COCurva);
   }
-
+  if (id == GAS_CH4) {
+    return GetPorcentajeMQ(ratio, CH4Curva);
+  }
   return 0;
-}
-int GetPorcentajeMQ(float ratio, float *curva) {
-  return (pow(10, (((log(ratio) - curva[1]) / curva[2]) + curva[0])));
 }
