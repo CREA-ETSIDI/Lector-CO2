@@ -40,7 +40,7 @@ class MQ {
     int GetPorcentajeMQ(float ratio, float *curva);
 };
 
-class MQ2: public MQ {   //mq2: lpg, CO, CH4
+class MQ2: public MQ {   //mq2: lpg, CO, CH4 //ESTE YA FUNCIONA
   public:
     //curvas
     float LPGCurva[3] = {2.3, 0.36, -0.47};
@@ -52,23 +52,23 @@ class MQ2: public MQ {   //mq2: lpg, CO, CH4
     //funciones
     int PorcentajeMQ(float ratio, int id);
 };
-class MQ3: public MQ {   //mq3: alcohol(OH), benceno(C6H6)
+class MQ3: public MQ {   //mq3: alcohol(OH), benceno(C6H6) //ESTE YA FUNCIONA (tal vez habria que calibrarlo un poco)
   public:
     //curvas
-    float OHCurva[3] = { -1, 0.21, -0.72};
-    float C6H6Curva[3] = { -1, 0.71, -0.33};
+    float OHCurva[3] = { -1, 0.34, -0.56};
+    float C6H6Curva[3] = { -1, 0.61, -0.33};
     enum GASES {GAS_OH = 0, GAS_C6H6};
     MQ3(): MQ() {};
 
     //funciones
     int PorcentajeMQ(float ratio, int id);
 };
-class MQ4: public MQ {   //mq4: lpg, metano, hidrogeno
+class MQ4: public MQ {   //mq4: lpg, metano, hidrogeno //ESTE YA FUNCIONA
   public:
     //curvas
-    float LPGCurva[3] = {2.3, 0.43, -0.72};
-    float CH4Curva[3] = {2.3, 0.477, -0.05};
-    float H2Curva[3] = {1, 1, -1};
+    float LPGCurva[3] = {2.3, 0.43, -0.34};
+    float CH4Curva[3] = {2.3, 0.255, -0.34};
+    float H2Curva[3] = {2.3, 0.59, -0.19};
     enum GASES {GAS_LPG = 0, GAS_CH4, GAS_H2};
     MQ4(): MQ() {};
 
@@ -90,9 +90,9 @@ class MQ4: public MQ {   //mq4: lpg, metano, hidrogeno
 class MQ6: public MQ {   //mq6: lpg, metano, hidrogeno
   public:
     //curvas
-    float LPGCurva[3] = {1, 1, -1};
-    float CH4Curva[3] = {2.3, 0.477, -0.05};
-    float H2Curva[3] = {2.3, 0.71, -0.33};
+    float LPGCurva[3] = {2.3, 0.3, -0.39};
+    float CH4Curva[3] = {2.3, 0.176, -0.435};
+    float H2Curva[3] = {2.3, 0.778, -0.2};
     enum GASES {GAS_LPG = 0, GAS_CH4, GAS_H2};
     MQ6(): MQ() {};
 
@@ -102,8 +102,8 @@ class MQ6: public MQ {   //mq6: lpg, metano, hidrogeno
 class MQ7: public MQ {   //mq7: hidrogeno, co
   public:
     //curvas
-    float H2Curva[3] = {1, 1, -1};
-    float COCurva[3] = {1, 1, -1};
+    float H2Curva[3] = {1.69, 0.11, -0.124};
+    float COCurva[3] = {1.69, 0.176, -0.6};
     enum GASES {GAS_H2 = 0, GAS_CO};
     MQ7(): MQ() {};
 
@@ -113,7 +113,7 @@ class MQ7: public MQ {   //mq7: hidrogeno, co
 class MQ8: public MQ {   //mq8: hidrogeno
   public:
     //curvas
-    float H2Curva[3] = {1, 1, 1};
+    float H2Curva[3] = {2, -0.6, 0.648};
     enum GASES {GAS_H2 = 0};
     MQ8(): MQ() {};
 
@@ -123,9 +123,9 @@ class MQ8: public MQ {   //mq8: hidrogeno
 class MQ9: public MQ {   //mq9: co, lpg,ch4
   public:
     //curvas
-    float COCurva[3] = {1, 1, -1};
-    float LPGCurva[3] = {1, 1, -1};
-    float CH4Curva[3] = {1, 1, -1};
+    float COCurva[3] = {2.3,0.255, -1.117};
+    float LPGCurva[3] = {2.3, 0.33, -0.64};
+    float CH4Curva[3] = {2.3, 0.49, -0.455};
     enum GASES {GAS_CO = 0, GAS_LPG, GAS_CH4};
     MQ9(): MQ() {};
 
@@ -216,6 +216,33 @@ void loop() {
   Serial.print("H2:");
   Serial.println(mq4.PorcentajeMQ(mq4.LecturaMQ(pin_MQ4) / RC_MQ4, mq4.GAS_H2) );
   readString = "";
+  //
+   Serial.print("LPG:");
+  Serial.println(mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_LPG) );
+  Serial.print("CH4:");
+  Serial.println(mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_CH4) );
+  Serial.print("H2:");
+  Serial.println(mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_H2) );
+  readString = "";
+  //
+   Serial.print("H2:");
+  Serial.println(mq7.PorcentajeMQ(mq7.LecturaMQ(pin_MQ7) / RC_MQ7, mq7.GAS_H2) );
+  Serial.print("CO:");
+  Serial.println(mq7.PorcentajeMQ(mq7.LecturaMQ(pin_MQ7) / RC_MQ7, mq7.GAS_CO) );
+  readString = "";
+  //
+  Serial.print("H2:");
+  Serial.println(mq8.PorcentajeMQ(mq8.LecturaMQ(pin_MQ8) / RC_MQ8, mq8.GAS_H2) );
+  //
+   Serial.print("CO:");
+  Serial.println(mq9.PorcentajeMQ(mq9.LecturaMQ(pin_MQ9) / RC_MQ9, mq9.GAS_CO) );
+  Serial.print("LPG:");
+  Serial.println(mq9.PorcentajeMQ(mq9.LecturaMQ(pin_MQ9) / RC_MQ9, mq9.GAS_LPG) );
+  Serial.print("CH4:");
+  Serial.println(mq9.PorcentajeMQ(mq9.LecturaMQ(pin_MQ9) / RC_MQ9, mq9.GAS_CH4) );
+  readString = "";
+  //
+  //
 }
 
 float MQ::CalculoRMQ(int val) { //calculo de las resistencia del sensor
