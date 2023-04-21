@@ -116,17 +116,17 @@ void setup() {
 #endif
 
    
-    float tempOffset = 0.0; //Offset de temperatura según las condiciones de trabajo
-    error = sen5x.setTemperatureOffsetSimple(tempOffset);
-    if (error) {
-        Serial.print("Error en función setTemperatureOffsetSimple(): ");
-        errorToString(error, errorMessage, 256);
-        Serial.println(errorMessage);
-    } else {
-        Serial.print("Offset de temperatura: ");
-        Serial.print(tempOffset);
-        Serial.println(" deg. Celsius (SEN54/SEN55 only");
-    }
+    //float tempOffset = 0.0; //Offset de temperatura según las condiciones de trabajo
+    //error = sen5x.setTemperatureOffsetSimple(tempOffset);
+    //if (error) {
+      //  Serial.print("Error en función setTemperatureOffsetSimple(): ");
+      //  errorToString(error, errorMessage, 256);
+      //  Serial.println(errorMessage);
+    // } else {
+       // Serial.print("Offset de temperatura: ");
+       // Serial.print(tempOffset);
+       // Serial.println(" deg. Celsius (SEN54/SEN55 only");
+    // }
 
     // Start Measurement
     error = sen5x.startMeasurement();
