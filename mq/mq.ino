@@ -3,12 +3,12 @@
 #define pin_MQ2 A0
 #define pin_MQ3 A1
 #define pin_MQ4 A2
-#define pin_MQ5 A3
+//#define pin_MQ5 A3
 #define pin_MQ6 A4
 #define pin_MQ7 A5
 #define pin_MQ8 A6
 #define pin_MQ9 A7
-#define pin_MQ135 A8
+//#define pin_MQ135 A8
 
 
 //Expresada en KiloOhmios (RESULTADOS DE CALIBRACIÓN)
@@ -156,7 +156,7 @@ MQ9 mq9;
 //MQ135 mq135;
 void setup() {
   Serial.begin(9600);
-  //calibración de MQ (todos en teoría, habría q ir poniendolos para que fueran saliendo-pero not yet-)
+  
   Serial.print("Calibrando el sensor MQ2 ");
   RC_MQ2 = mq2.CalibracionMQ(pin_MQ2);
   Serial.println(RC_MQ2);
@@ -181,11 +181,11 @@ void setup() {
   RC_MQ7 = mq7.CalibracionMQ(pin_MQ7);
   Serial.println(RC_MQ7);
   //
-  Serial.print("Calibrando el sensor MQ8");
+  Serial.print("Calibrando el sensor MQ8 ");
   RC_MQ8 = mq8.CalibracionMQ(pin_MQ8);
   Serial.println(RC_MQ8);
   //
-  Serial.print("Calibrando el sensor MQ9");
+  Serial.print("Calibrando el sensor MQ9 ");
   RC_MQ9 = mq9.CalibracionMQ(pin_MQ9);
   Serial.println(RC_MQ9);
     //
@@ -195,6 +195,7 @@ void setup() {
 }
 
 void loop() {
+  Serial.print("MQ2: ");
   Serial.print("LPG:");
   Serial.println(mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_LPG) );
   Serial.print("CO:");
@@ -203,12 +204,14 @@ void loop() {
   Serial.println(mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_CH4) );
   readString = "";
   //
+   Serial.print("MQ3: ");
   Serial.print("Alcohol:");
   Serial.println(mq3.PorcentajeMQ(mq3.LecturaMQ(pin_MQ3) / RC_MQ3, mq3.GAS_OH) );
   Serial.print("Benceno:");
   Serial.println(mq3.PorcentajeMQ(mq3.LecturaMQ(pin_MQ3) / RC_MQ3, mq3.GAS_C6H6) );
   readString = "";
   //
+  Serial.print("MQ4: ");
   Serial.print("LPG:");
   Serial.println(mq4.PorcentajeMQ(mq4.LecturaMQ(pin_MQ4) / RC_MQ4, mq4.GAS_LPG) );
   Serial.print("CH4:");
@@ -217,6 +220,7 @@ void loop() {
   Serial.println(mq4.PorcentajeMQ(mq4.LecturaMQ(pin_MQ4) / RC_MQ4, mq4.GAS_H2) );
   readString = "";
   //
+    Serial.print("MQ6: ");
    Serial.print("LPG:");
   Serial.println(mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_LPG) );
   Serial.print("CH4:");
@@ -225,15 +229,18 @@ void loop() {
   Serial.println(mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_H2) );
   readString = "";
   //
+    Serial.print("MQ7: ");
    Serial.print("H2:");
   Serial.println(mq7.PorcentajeMQ(mq7.LecturaMQ(pin_MQ7) / RC_MQ7, mq7.GAS_H2) );
   Serial.print("CO:");
   Serial.println(mq7.PorcentajeMQ(mq7.LecturaMQ(pin_MQ7) / RC_MQ7, mq7.GAS_CO) );
   readString = "";
   //
+    Serial.print("MQ8: ");
   Serial.print("H2:");
   Serial.println(mq8.PorcentajeMQ(mq8.LecturaMQ(pin_MQ8) / RC_MQ8, mq8.GAS_H2) );
   //
+    Serial.print("MQ9: ");
    Serial.print("CO:");
   Serial.println(mq9.PorcentajeMQ(mq9.LecturaMQ(pin_MQ9) / RC_MQ9, mq9.GAS_CO) );
   Serial.print("LPG:");
@@ -263,7 +270,7 @@ float MQ::CalibracionMQ (int pin) { //funcion que calibra los MQ
 
 float MQ::LecturaMQ(int pin) {
   float valor = 0;
-  for (int i = 0; i < MRPC; i++) { // toma una serie de medidas previas para ver si se está calibrando o no
+  for (int i = 0; i < MRPC; i++) { 
     valor += CalculoRMQ(analogRead(pin));
     delay(50);
   }
