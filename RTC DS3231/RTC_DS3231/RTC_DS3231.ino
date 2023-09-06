@@ -8,12 +8,12 @@
 RTC_DS3231 rtc;
 
 void setup() {
-   Serial.begin(9600);
+   Serial.begin(115200);
    delay(1000);
 //
-   if (!rtc.begin()) {
+   while (!rtc.begin()) {
       Serial.println(F("No se encontró RTC"));
-      while (1);
+      //while (1);
    }
 
    if (rtc.lostPower()) {

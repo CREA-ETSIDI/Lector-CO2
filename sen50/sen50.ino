@@ -1,3 +1,8 @@
+//Vcc
+//GND
+//SDA
+//SCL
+
 #include <SensirionCore.h>
 #include <Arduino.h>
 #include <SensirionI2CSen5x.h>
