@@ -24,7 +24,16 @@
   //#define pin_MQ135 A8
 #endif
 
-
+//definicion de donde se conectan
+#define pin_MQ2 A0
+#define pin_MQ3 A1
+#define pin_MQ4 A2
+//#define pin_MQ5 A3
+#define pin_MQ6 A4
+#define pin_MQ7 A5
+#define pin_MQ8 A6
+#define pin_MQ9 A7
+//#define pin_MQ135 A8
 
 
 //Expresada en KiloOhmios (RESULTADOS DE CALIBRACIÓN)
@@ -211,8 +220,7 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("");
-  Serial.println("MQ2: ");
+  Serial.print("MQ2: ");
   Serial.print("LPG:");
   Serial.println(mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_LPG) );
   Serial.print("CO:");
@@ -221,7 +229,6 @@ void loop() {
   Serial.println(mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_CH4) );
   readString = "";
   //
-  /*
    Serial.print("MQ3: ");
   Serial.print("Alcohol:");
   Serial.println(mq3.PorcentajeMQ(mq3.LecturaMQ(pin_MQ3) / RC_MQ3, mq3.GAS_OH) );
@@ -295,8 +302,7 @@ float MQ::CalibracionMQ (int pin) { //funcion que calibra los MQ
 
 float MQ::LecturaMQ(int pin) {
   float valor = 0;
-  for (int i = 0; i < MRPC; i++) {
-    #ifdef _ARDUINO_
+  for (int i = 0; i < MRPC; i++) { 
     valor += CalculoRMQ(analogRead(pin));
     #else
     valor += CalculoRMQ(analogRead(pin)/6.06);
