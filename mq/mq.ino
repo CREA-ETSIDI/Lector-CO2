@@ -1,13 +1,30 @@
-//definicion de donde se conectan
-#define pin_MQ2 34
-#define pin_MQ3 35
-#define pin_MQ4 35
-//#define pin_MQ5 A3
-#define pin_MQ6 35
-#define pin_MQ7 35
-#define pin_MQ8 35
-#define pin_MQ9 35
-//#define pin_MQ135 A8
+//#define _ARDUINO_
+
+#ifdef _ARDUINO_
+  //definicion de donde se conectan
+  #define pin_MQ2 A0
+  #define pin_MQ3 A5
+  #define pin_MQ4 A5
+  //#define pin_MQ5 A3
+  #define pin_MQ6 A5
+  #define pin_MQ7 A5
+  #define pin_MQ8 A5
+  #define pin_MQ9 A5
+  //#define pin_MQ135 A8
+#else
+  //definicion de donde se conectan
+  #define pin_MQ2 26
+  #define pin_MQ3 35
+  #define pin_MQ4 35
+  //#define pin_MQ5 A3
+  #define pin_MQ6 35
+  #define pin_MQ7 35
+  #define pin_MQ8 35
+  #define pin_MQ9 35
+  //#define pin_MQ135 A8
+#endif
+
+
 
 
 //Expresada en KiloOhmios (RESULTADOS DE CALIBRACIÓN)
@@ -194,7 +211,8 @@ void setup() {
 }
 
 void loop() {
-  Serial.print("MQ2: ");
+  Serial.println("");
+  Serial.println("MQ2: ");
   Serial.print("LPG:");
   Serial.println(mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_LPG) );
   Serial.print("CO:");
@@ -260,10 +278,16 @@ float MQ::CalculoRMQ(int val) { //calculo de las resistencia del sensor
 float MQ::CalibracionMQ (int pin) { //funcion que calibra los MQ
   float valor = 0;
   for (int i = 0; i < MRPC; i++) { // toma una serie de medidas previas para ver si se está calibrando o no
+    #ifdef _ARDUINO_
+    valor += CalculoRMQ(analogRead(pin));
+    #else
     valor += CalculoRMQ(analogRead(pin)/6.06);
+    #endif
     delay(50);
   }
   valor = valor / MRPC;
+
+  Serial.print("Lectura analogica media: "); Serial.println(valor);
   valor = valor / RAL;
 
   return valor;
@@ -271,11 +295,16 @@ float MQ::CalibracionMQ (int pin) { //funcion que calibra los MQ
 
 float MQ::LecturaMQ(int pin) {
   float valor = 0;
-  for (int i = 0; i < MRPC; i++) { 
+  for (int i = 0; i < MRPC; i++) {
+    #ifdef _ARDUINO_
+    valor += CalculoRMQ(analogRead(pin));
+    #else
     valor += CalculoRMQ(analogRead(pin)/6.06);
+    #endif
     delay(50);
   }
   valor = valor / MRPC;
+  Serial.print("Lectura analogica media: "); Serial.println(valor);
   return valor;
 }
 int MQ::PorcentajeMQ(float ratio, int id) { //para identificar el tipo de gas

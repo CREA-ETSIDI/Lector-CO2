@@ -5,7 +5,7 @@ void bmp280Setup(){
 
   if (!bmp.begin()) {
     Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
-    while (1);
+    //while (1);
   }
 
   bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Modo de operación */

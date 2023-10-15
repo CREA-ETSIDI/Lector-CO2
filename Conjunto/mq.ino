@@ -1,12 +1,12 @@
 //definicion de donde se conectan
-#define pin_MQ2 34
-#define pin_MQ3 35
+#define pin_MQ2 26
+#define pin_MQ3 33
 #define pin_MQ4 35
 //#define pin_MQ5 A3
-#define pin_MQ6 35
+//#define pin_MQ6 35
 #define pin_MQ7 35
-#define pin_MQ8 35
-#define pin_MQ9 35
+#define pin_MQ8 34
+#define pin_MQ9 25
 //#define pin_MQ135 A8
 
 
@@ -148,13 +148,19 @@ MQ2 mq2;
 MQ3 mq3;
 MQ4 mq4;
 //MQ5 mq5;
-MQ6 mq6;
+//MQ6 mq6;
 MQ7 mq7;
 MQ8 mq8;
 MQ9 mq9;
 //MQ135 mq135;
 
 void mqSetup(){
+  pinMode(27, OUTPUT);
+  pinMode(14, OUTPUT);
+  
+  digitalWrite(27,HIGH);
+  digitalWrite(14,HIGH);
+  
   Serial.print("Calibrando el sensor MQ2 ");
   RC_MQ2 = mq2.CalibracionMQ(pin_MQ2);
   Serial.println(RC_MQ2);
@@ -171,9 +177,9 @@ void mqSetup(){
 //  RC_MQ5 = mq5.CalibracionMQ(pin_MQ5);
 //  Serial.println(RC_MQ5);
   //
-  Serial.print("Calibrando el sensor MQ6 ");
-  RC_MQ6 = mq6.CalibracionMQ(pin_MQ6);
-  Serial.println(RC_MQ6);
+//  Serial.print("Calibrando el sensor MQ6 ");
+//  RC_MQ6 = mq6.CalibracionMQ(pin_MQ6);
+//  Serial.println(RC_MQ6);
   //
   Serial.print("Calibrando el sensor MQ7 ");
   RC_MQ7 = mq7.CalibracionMQ(pin_MQ7);
@@ -212,11 +218,16 @@ float MQ::CalibracionMQ (int pin) { //funcion que calibra los MQ
 
 float MQ::LecturaMQ(int pin) {
   float valor = 0;
-  for (int i = 0; i < MRPC; i++) { 
+  for (int i = 0; i < MRPC; i++) {
+    #ifdef _ARDUINO_
+    valor += CalculoRMQ(analogRead(pin));
+    #else
     valor += CalculoRMQ(analogRead(pin)/6.06);
+    #endif
     delay(50);
   }
   valor = valor / MRPC;
+  Serial.print("Lectura analogica media: "); Serial.println(valor);
   return valor;
 }
 int MQ::PorcentajeMQ(float ratio, int id) { //para identificar el tipo de gas
@@ -324,47 +335,56 @@ int MQ9::PorcentajeMQ(float ratio, int id) { //para identificar el tipo de gas
 //  return 0;
 //}
 
+//D14 ON
+//D27 ON
 float get_CO(){
-  float mq2_co = mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_CO);
+  float mq2_co = 0;//mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_CO);
   float mq7_co = mq7.PorcentajeMQ(mq7.LecturaMQ(pin_MQ7) / RC_MQ7, mq7.GAS_CO);
-  float mq9_co = mq9.PorcentajeMQ(mq9.LecturaMQ(pin_MQ9) / RC_MQ9, mq9.GAS_CO);
+  float mq9_co = 0;//mq9.PorcentajeMQ(mq9.LecturaMQ(pin_MQ9) / RC_MQ9, mq9.GAS_CO);
 
   return (mq2_co+mq7_co+mq9_co)/3.0;
 }
 
+//D14 ON
+//D27 ON
 float get_LPG(){
-  float mq2_LPG = mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_LPG);
+  float mq2_LPG = 0;//mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_LPG);
   float mq4_LPG = mq4.PorcentajeMQ(mq4.LecturaMQ(pin_MQ4) / RC_MQ4, mq4.GAS_LPG);
-  float mq6_LPG = mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_LPG);
-  float mq9_LPG = mq9.PorcentajeMQ(mq9.LecturaMQ(pin_MQ9) / RC_MQ9, mq9.GAS_LPG);
+  //float mq6_LPG = mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_LPG);
+  float mq9_LPG = 0;//mq9.PorcentajeMQ(mq9.LecturaMQ(pin_MQ9) / RC_MQ9, mq9.GAS_LPG);
 
-  return (mq2_LPG + mq4_LPG + mq6_LPG + mq9_LPG)/4.0; 
+  return (mq2_LPG + mq4_LPG + mq9_LPG)/3.0; 
 }
 
+//D14 ON
+//D27 ON
 float get_CH4(){
-  float mq2_CH4 = mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_CH4);
+  float mq2_CH4 = 0;//mq2.PorcentajeMQ(mq2.LecturaMQ(pin_MQ2) / RC_MQ2, mq2.GAS_CH4);
   float mq4_CH4 = mq4.PorcentajeMQ(mq4.LecturaMQ(pin_MQ4) / RC_MQ4, mq4.GAS_CH4);
-  float mq6_CH4 = mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_CH4);
-  float mq9_CH4 = mq9.PorcentajeMQ(mq9.LecturaMQ(pin_MQ9) / RC_MQ9, mq9.GAS_CH4);
+  //float mq6_CH4 = mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_CH4);
+  float mq9_CH4 = 0;//mq9.PorcentajeMQ(mq9.LecturaMQ(pin_MQ9) / RC_MQ9, mq9.GAS_CH4);
 
-  return (mq2_CH4 + mq4_CH4 + mq6_CH4 + mq9_CH4)/4.0;
+  return (mq2_CH4 + mq4_CH4 + mq9_CH4)/3.0;
 }
 
+//D27 ON
 float get_OH(){
   float mq3_OH = mq3.PorcentajeMQ(mq3.LecturaMQ(pin_MQ3) / RC_MQ3, mq3.GAS_OH);
 
   return (mq3_OH)/1.0;
 }
 
+//D27 ON
 float get_C6H6(){
   float mq3_C6H6 = mq3.PorcentajeMQ(mq3.LecturaMQ(pin_MQ3) / RC_MQ3, mq3.GAS_C6H6);
 
   return (mq3_C6H6)/1.0;
 }
 
+//D14 ON
 float get_H2(){
   float mq4_H2 = mq4.PorcentajeMQ(mq4.LecturaMQ(pin_MQ4) / RC_MQ4, mq4.GAS_H2);
-  float mq6_H2 = mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_H2);
+  //float mq6_H2 = mq6.PorcentajeMQ(mq6.LecturaMQ(pin_MQ6) / RC_MQ6, mq6.GAS_H2);
   float mq8_H2 = mq8.PorcentajeMQ(mq8.LecturaMQ(pin_MQ8) / RC_MQ8, mq8.GAS_H2);
 
   return mq8_H2;
